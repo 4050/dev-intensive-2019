@@ -15,14 +15,25 @@ class Bender (
         Question.IDLE -> Question.IDLE.question
     }
 
-    fun listenAnswer(answer: String): Pair<String, Triple<Int,Int,Int>>{
-        return if (question.answers.contains(answer)){
+    fun listenAnswer(answer: String): Pair<String, Triple<Int, Int, Int>> {
+        val resultStr: String
+
+        if (question == Question.IDLE) {
+            resultStr = question.question 
+        } else if (question.answers.contains(answer.toLowerCase())) {
             question = question.nextQuestion()
-            "Отлично - это правильный ответ \n${question.question}" to status.color
+            resultStr = "Отлично - ты справился\n${question.question}"
         } else {
             status = status.nextStatus()
-            "Это не правильный ответ \n${question.question}" to status.color
+                if (status == Status.NORMAL) {
+                    question = Question.NAME
+                        resultStr = "Это неправильный ответ. Давай все по новой\n${question.question}"
+                            } else {
+                             resultStr = "Это неправильный ответ\n${question.question}"
+            }
         }
+
+        return resultStr to status.color
     }
 
 
