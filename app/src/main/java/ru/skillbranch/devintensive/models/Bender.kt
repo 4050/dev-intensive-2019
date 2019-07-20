@@ -19,50 +19,34 @@ class Bender (
     }
     fun listenAnswer(answer: String): Pair<String, Triple<Int, Int, Int>> {
 
-        // validating answer, don't change status if is not validated
-        when (question) {
-            Question.NAME -> {
-                if (!answer[0].isUpperCase())
-                    return "Имя должно начинаться с заглавной буквы\n${question.question}" to status.color
-            }
-            Question.PROFESSION -> {
-                if (!answer[0].isLowerCase())
-                    return "Профессия должна начинаться со строчной буквы\n${question.question}" to status.color
-            }
-            Question.MATERIAL -> {
-                if (answer.contains(Regex("[0-9]")))
-                    return "Материал не должен содержать цифр\n${question.question}" to status.color
-            }
-            Question.BDAY -> {
-                if (!answer.isDigitsOnly())
-                    return "Год моего рождения должен содержать только цифры\n${question.question}" to status.color
-            }
-            Question.SERIAL -> {
-                if (!(answer.length == 7 && answer.isDigitsOnly()))
-                    return "Серийный номер содержит только цифры, и их 7\n${question.question}" to status.color
-            }
-            Question.IDLE -> {
-                return "Отлично - ты справился\nНа этом все, вопросов больше нет" to status.color
-            }
-        }
-
-
-        for (correctAnswer in question.answers) {
-            if (answer.equals(correctAnswer, true)) {
+        return when {
+            question == Question.NAME && (answer.isEmpty() || answer.first().isLowerCase() || answer.first().isDigit()) ->
+                "Имя должно начинаться с заглавной буквы\n${question.question}" to status.color
+            question == Question.PROFESSION && (answer.isEmpty() || answer.first().isUpperCase() || answer.first().isDigit()) ->
+                "Профессия должна начинаться со строчной буквы\n${question.question}" to status.color
+            question == Question.MATERIAL && answer.contains(Regex("[0-9]")) ->
+                "Материал не должен содержать цифр\n${question.question}" to status.color
+            question == Question.BDAY && answer.contains(Regex("\\D")) ->
+                "Год моего рождения должен содержать только цифры\n${question.question}" to status.color
+            question == Question.SERIAL && (answer.contains(Regex("\\D")) || answer.length != 7) ->
+                "Серийный номер содержит только цифры, и их 7\n${question.question}" to status.color
+            question == Question.IDLE -> "На этом все, вопросов больше нет" to status.color
+            else -> if (question.answers.contains(answer.toLowerCase())) {
                 question = question.nextQuestion()
-                return "Отлично - ты справился\n${question.question}" to status.color
+                "Отлично - ты справился\n${question.question}" to status.color
+            } else {
+                status = status.nextStatus()
+                if (status == Status.NORMAL) {
+                    question = Question.NAME
+                    "Это неправильный ответ. Давай все по новой\n${question.question}" to status.color
+                } else {
+                    "Это неправильный ответ\n${question.question}" to status.color
+                }
             }
         }
-
-        if (status == Status.CRITICAL) {
-            status = status.nextStatus()
-            question = Question.NAME
-            return "Это неправильный ответ. Давай все по новой\n${question.question}" to status.color
-        }
-
-        status = status.nextStatus()
-        return "Это неправильный ответ\n${question.question}" to status.color
     }
+
+
 
 
     enum class Status(val color:Triple<Int, Int, Int>){
