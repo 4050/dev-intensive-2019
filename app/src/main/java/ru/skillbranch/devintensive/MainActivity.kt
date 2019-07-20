@@ -19,10 +19,6 @@ import ru.skillbranch.devintensive.extensions.isKeyboardOpen
 import ru.skillbranch.devintensive.models.Bender
 
 class MainActivity : AppCompatActivity() , View.OnClickListener, TextView.OnEditorActionListener {
-    override fun onEditorAction(p0: TextView?, p1: Int, p2: KeyEvent?): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
     lateinit var benderImage: ImageView
     lateinit var textTxt: TextView
     lateinit var messageEt: EditText
@@ -35,8 +31,12 @@ class MainActivity : AppCompatActivity() , View.OnClickListener, TextView.OnEdit
         setContentView(R.layout.activity_main)
 
 
-        initView()
-        createActionDone()
+        benderImage = iv_bender
+        textTxt = tv_text
+        messageEt = et_message
+        sendBtn = iv_send
+        sendBtn.setOnClickListener(this)
+        messageEt.setOnEditorActionListener(this)
 
 
         val mStatus = savedInstanceState?.getString("STATUS") ?: Bender.Status.NORMAL.name
@@ -47,27 +47,11 @@ class MainActivity : AppCompatActivity() , View.OnClickListener, TextView.OnEdit
 
         textTxt.text = benderObj.askQuestion()
 
-        val (r, g, b) = benderObj.status.color
-        benderImage.setColorFilter(Color.rgb(r, g, b), PorterDuff.Mode.MULTIPLY)
+        val (r,g,b) = benderObj.status.color
+        benderImage.setColorFilter(Color.rgb(r,g,b), PorterDuff.Mode.MULTIPLY)
 
     }
 
-    private fun initView() {
-        benderImage = iv_bender
-        textTxt = tv_text
-        messageEt = et_message
-        sendBtn = iv_send
-        sendBtn.setOnClickListener(this)
-        makeSendOnActionDone(messageEt)
-    }
-
-    private fun createActionDone() {
-        et_message.setRawInputType(InputType.TYPE_CLASS_TEXT)
-        et_message.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) sendBtn.performClick()
-            false
-        }
-    }
 
     override fun onRestart() {
         super.onRestart()
@@ -110,25 +94,27 @@ class MainActivity : AppCompatActivity() , View.OnClickListener, TextView.OnEdit
         Log.d("M_MainActivity", "onSaveInstanceState ${benderObj.status.name}  ${benderObj.question.name}")
     }
 
-    private fun makeSendOnActionDone(editText: EditText) {
-        editText.setRawInputType(InputType.TYPE_CLASS_TEXT)
-        editText.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) sendBtn.performClick()
-            false
+
+    override fun onClick(v: View?) {
+        if (v?.id == R.id.iv_send){
+            val (phrase, color) = benderObj.listenAnswer(messageEt.text.toString())
+            messageEt.setText("")
+            val (r,g,b) = color
+            benderImage.setColorFilter(Color.rgb(r,g,b), PorterDuff.Mode.MULTIPLY)
+            textTxt.text = phrase
+            if (this.isKeyboardOpen()){
+                this.hideKeyboard()
+            }
         }
     }
 
-    private fun sendAnswer() {
-        val (phase, color) = benderObj.listenAnswer(messageEt.text.toString().toLowerCase())
-        messageEt.setText("")
-        val(r, g, b) = color
-        benderImage.setColorFilter(Color.rgb(r, g, b), PorterDuff.Mode.MULTIPLY)
-        textTxt.text = phase
-    }
-
-    override fun onClick(v: View?) {
-        if (v?.id == R.id.iv_send)
-            sendAnswer()
+    override fun onEditorAction(view: TextView?, actionId: Int, event: KeyEvent?): Boolean {
+        return if (view?.id == R.id.et_message && actionId == EditorInfo.IME_ACTION_DONE) {
+            sendBtn.performClick()
+            true
+        } else {
+            false
+        }
     }
 }
 
