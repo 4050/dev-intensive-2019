@@ -32,7 +32,12 @@ class MainActivity : AppCompatActivity() , View.OnClickListener, TextView.OnEdit
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        initView()
+        benderImage = iv_bender
+        textTxt = tv_text
+        messageEt = et_message
+        sendBtn = iv_send
+        sendBtn.setOnClickListener(this)
+        messageEt.setOnEditorActionListener(this)
 
         val mStatus = savedInstanceState?.getString("STATUS") ?: Bender.Status.NORMAL.name
         val mQuestion = savedInstanceState?.getString("QUESTION") ?: Bender.Question.NAME.name
@@ -46,17 +51,6 @@ class MainActivity : AppCompatActivity() , View.OnClickListener, TextView.OnEdit
         benderImage.setColorFilter(Color.rgb(r, g, b), PorterDuff.Mode.MULTIPLY)
 
     }
-
-        fun initView() {
-        benderImage = iv_bender
-        textTxt = tv_text
-        messageEt = et_message
-        sendBtn = iv_send
-        sendBtn.setOnClickListener(this)
-        messageEt.setOnEditorActionListener(this)
-    }
-
-
 
     override fun onRestart() {
         super.onRestart()
