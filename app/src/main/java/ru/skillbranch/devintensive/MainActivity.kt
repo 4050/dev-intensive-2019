@@ -58,6 +58,7 @@ class MainActivity : AppCompatActivity() , View.OnClickListener, TextView.OnEdit
         messageEt = et_message
         sendBtn = iv_send
         sendBtn.setOnClickListener(this)
+        makeSendOnActionDone(messageEt)
     }
 
     private fun createActionDone() {
