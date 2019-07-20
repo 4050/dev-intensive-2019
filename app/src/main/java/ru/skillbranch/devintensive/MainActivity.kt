@@ -99,7 +99,7 @@ class MainActivity : AppCompatActivity() , View.OnClickListener, TextView.OnEdit
         Log.d("M_MainActivity", "onSaveInstanceState ${benderObj.status.name}  ${benderObj.question.name}")
     }
 
-    private fun sendAnswer() {
+    override fun onClick(v: View?){
         val (phase, color) = benderObj.listenAnswer(messageEt.text.toString().toLowerCase())
         messageEt.setText("")
         val(r, g, b) = color
@@ -107,12 +107,6 @@ class MainActivity : AppCompatActivity() , View.OnClickListener, TextView.OnEdit
         textTxt.text = phase
         if (this.isKeyboardOpen()){
             this.hideKeyboard()
-        }
-    }
-
-    override fun onClick(v: View?){
-        if (v?.id == R.id.iv_send) {
-            sendAnswer()
         }
     }
 
