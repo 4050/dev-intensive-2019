@@ -94,17 +94,20 @@ class MainActivity : AppCompatActivity() , View.OnClickListener, TextView.OnEdit
         Log.d("M_MainActivity", "onSaveInstanceState ${benderObj.status.name}  ${benderObj.question.name}")
     }
 
+    fun onMessage(){
+        val (phrase, color) = benderObj.listenAnswer(messageEt.text.toString())
+        messageEt.setText("")
+        val (r,g,b) = color
+        benderImage.setColorFilter(Color.rgb(r,g,b), PorterDuff.Mode.MULTIPLY)
+        textTxt.text = phrase
+        if (this.isKeyboardOpen()){
+            this.hideKeyboard()
+        }
+    }
 
     override fun onClick(v: View?) {
         if (v?.id == R.id.iv_send){
-            val (phrase, color) = benderObj.listenAnswer(messageEt.text.toString())
-            messageEt.setText("")
-            val (r,g,b) = color
-            benderImage.setColorFilter(Color.rgb(r,g,b), PorterDuff.Mode.MULTIPLY)
-            textTxt.text = phrase
-            if (this.isKeyboardOpen()){
-                this.hideKeyboard()
-            }
+            onMessage()
         }
     }
 
