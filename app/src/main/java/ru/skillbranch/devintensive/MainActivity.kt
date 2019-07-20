@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity() , View.OnClickListener, TextView.OnEdit
 
     }
 
-    private fun initView() {
+        fun initView() {
         benderImage = iv_bender
         textTxt = tv_text
         messageEt = et_message
